@@ -13,7 +13,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
-port = "8000"
+port = 8000
 
 # 4. 진짜 서버 객체 만들기 
 #    (힌트: HTTPServer에게 주소와 점원을 알려주세요)
