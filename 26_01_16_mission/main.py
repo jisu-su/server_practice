@@ -7,13 +7,23 @@ class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
         # 성공 응답(200) 보내기
+        self.send_response(200)
         # 헤더 마감하기 (내용물은 아직 없어도 돼요)
+        self.end_headers()
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
+host = "localhost"
+port = "8000"
 
 # 4. 진짜 서버 객체 만들기 
 #    (힌트: HTTPServer에게 주소와 점원을 알려주세요)
+server = HTTPServer((host,port),MyHandler)
 
 # 5. 서버 실행 문구 출력하기
+print("서버가 시작되었습니다")
 
 # 6. 무한 대기 실행하기 (try-except로 안전하게!)
+try:
+    server.serve_forever()
+except KeyboardInterrupt:
+    server.server_close()
