@@ -21,6 +21,7 @@ class MyHandler(BaseHTTPRequestHandler):
         # 헤더 마감하기 (내용물은 아직 없어도 돼요)
         self.end_headers()
 
+
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
 port = 8000
