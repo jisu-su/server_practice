@@ -6,21 +6,32 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
-        # 1. 일단 받은 것부터 터미널에 뿌려서 확인하기 (가장 먼저!)
-        print("--- 요청 시작 ---")
-        # 요청의 첫 번째 줄(Request Line) 출력하기
-        # -> self.requestline 이라는 변수에 담겨 있어요.
-        print(f"요청 라인: {self.requestline}")
-        # 요청 헤더(Headers) 출력하기
-        # -> self.headers 라는 변수를 print 해보세요.
-        print(f"헤더 내용:\n{self.headers}")
-        print("--- 요청 끝 ---")
-        # 2. 그다음에 손님에게 응답 보내기
-        # 성공 응답(200) 보내기
-        self.send_response(200)
-        # 헤더 마감하기 (내용물은 아직 없어도 돼요)
-        self.end_headers()
+        # 1. HTML 조립 (문자열 변수 만들기)
+        # 힌트: """ 이용하면 여러 줄의 HTML을 편하게 적을 수 있다.
+        # <script>태그 안에 console.log("응답을 받았습니다")를 꼭 넣기.
+        html_content = """
+        <!DOCTYPE html>
+        <html>
+        <head><title>Mission 3</title></head>
+        <body>
+            <h1>서버로부터 응답이 왔습니다!</h1>
+            <script>
+                // 응답을 받았습니다.
+            </script>
+        </body>
+        </html>
+        """
 
+        # 2. 응답 상태 코드 보내기 (성공!)
+        self.send_response(200)
+
+        # 3. 응답 헤더 설정 (이건 HTML이고, 한글이 안 깨지게 utf-8이야)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        # 4. 헤더 작성 끝내기
+        self.end_headers()
+        # 5. HTML 전송 (문자열을 바이트로 변환해서!)
+        message = "<p>나만의 서버</p>"
+        self.wfile.write(message.encode('utf-8'))
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
