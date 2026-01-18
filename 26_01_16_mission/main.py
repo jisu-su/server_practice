@@ -12,19 +12,18 @@ class MyHandler(BaseHTTPRequestHandler):
         html_content = """
         <!DOCTYPE html>
         <html>
-        <head><title>Mission 3</title></head>
+        <head>
+            <title>Mission 3</title>
+        </head>
         <body>
             <h1>서버 응답 받기</h1>
-            <script>
-                console.log("응답을 받았습니다.");
-            </script>
+            <script>console.log("응답을 받았습니다.");</script>
         </body>
         </html>
         """
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
-
         # 3. 응답 헤더 설정 (이건 HTML이고, 한글이 안 깨지게 utf-8이야)
         self.send_header('Content-Type', 'text/html; charset=utf-8')
         # 4. 헤더 작성 끝내기
