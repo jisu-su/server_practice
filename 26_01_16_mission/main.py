@@ -30,8 +30,7 @@ class MyHandler(BaseHTTPRequestHandler):
         # 4. 헤더 작성 끝내기
         self.end_headers()
         # 5. HTML 전송 (문자열을 바이트로 변환해서!)
-        message = "<p>나만의 서버</p>"
-        self.wfile.write(message.encode('utf-8'))
+        self.wfile.write(html_content.encode('utf-8'))
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
