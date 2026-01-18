@@ -16,7 +16,7 @@ class MyHandler(BaseHTTPRequestHandler):
         <body>
             <h1>서버로부터 응답이 왔습니다!</h1>
             <script>
-                console.log("응답을 받았습니다.")
+                console.log("응답을 받았습니다.");
             </script>
         </body>
         </html>
