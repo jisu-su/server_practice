@@ -14,7 +14,7 @@ class MyHandler(BaseHTTPRequestHandler):
         <html>
         <head><title>Mission 3</title></head>
         <body>
-            <h1>서버로부터 응답이 왔습니다!</h1>
+            <h1>서버 응답 받기</h1>
             <script>
                 console.log("응답을 받았습니다.");
             </script>
