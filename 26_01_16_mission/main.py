@@ -85,7 +85,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 <li>파트너 찾기
                 <li>부모 역할 수행
                 <li>재능과 능력의 활용 및 발전
-                <li>목표 추고
+                <li>목표 추구
             </ul>
             <br>
             <h1>욕구 이론에 대한 나의 생각</h1>
