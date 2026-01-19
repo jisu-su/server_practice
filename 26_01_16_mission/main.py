@@ -96,8 +96,8 @@ class MyHandler(BaseHTTPRequestHandler):
             <br>이처럼 매슬로우의 욕구 이론은 현대와 어울린다고 하기에는 조금 무리가 있다.</p>
             <hr>
             <h2>출처</h2>
-            <p>이미지 출처: <a src="https://pals.tistory.com/2523"></p>
-            <p>내용 출처: <a src="https://ko.wikipedia.org/wiki/%EB%A7%A4%EC%8A%AC%EB%A1%9C%EC%9D%98_%EC%9A%95%EA%B5%AC%EB%8B%A8%EA%B3%84%EC%9D%B4%EB%A1%A0"></p>
+            <p>이미지 출처: <a href="https://pals.tistory.com/2523" target="_blank">티스토리 바로가기</a></p>
+            <p>내용 출처: <a href="https://ko.wikipedia.org/wiki/%EB%A7%A4%EC%8A%AC%EB%A1%9C%EC%9D%98_%EC%9A%95%EA%B5%AC%EB%8B%A8%EA%B3%84%EC%9D%B4%EB%A1%A0" target="_blank">위키백과 바로가기</a></p>
         </body>
         </html>
         """
