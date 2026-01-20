@@ -22,6 +22,34 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return # 삭제 처리가 끝났으면 여기서 함수 종료!
         
+        # [Create] 새로운 단계 추가 로직 (새로 추가!)
+        if "/create" in self.path:
+            try:
+                # 1. 주소창에서 정보들 쪼개기
+                # 예: /create?stage=6단계&name=디지털욕구&content=연결되고싶다&example=폰,컴퓨터
+                query_string = self.path.split("?")[1]
+                params = query_string.split("&")
+                
+                # 각 정보를 딕셔너리로 조립하기 위해 데이터 추출
+                new_data = {}
+                for param in params:
+                    key, value = param.split("=")
+                    # URL 특수문자 처리를 위해 간단히 설명하면, 
+                    # 한글이 깨질 수 있으니 일단 영어나 간단한 한글로 테스트해보세요!
+                    new_data[key] = value
+                
+                # 2. 리스트에 추가 (이게 핵심 Create!)
+                maslow_data.append(new_data)
+                
+            except:
+                pass
+            
+            # 3. 추가했으니 다시 메인화면으로!
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers()
+            return
+        
         # 1. 고정된 상단 부분 (이미지 및 서론)
         header_html = """
         <h1>매슬로우의 욕구 이론</h1>
@@ -34,6 +62,25 @@ class MyHandler(BaseHTTPRequestHandler):
             하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
         </ul>
         <hr>
+        """
+
+        # Create를 위한 입력 양식 
+        create_form_html = """
+        <div style="background-color: #f9f9f9; padding: 20px; border: 2px dashed #ccc; margin-bottom: 30px;">
+            <h3>새로운 욕구 단계 등록하기</h3>
+            <form action="/create" method="GET">
+                <input type="text" name="stage" placeholder="예: 6단계" style="width: 100px;">
+                <input type="text" name="name" placeholder="욕구 이름 (예: 와이파이 욕구)">
+                <br><br>
+                <textarea name="content" placeholder="이 욕구에 대한 설명을 적어주세요" style="width: 100%; height: 60px;"></textarea>
+                <br><br>
+                <input type="text" name="example" placeholder="예시 (예: 5G, 무료 와이파이)" style="width: 100%;">
+                <br><br>
+                <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">
+                    피라미드에 추가하기
+                </button>
+            </form>
+        </div>
         """
             # 2. 데이터 기반으로 조립되는 부분 (동적)
         stages_html = ""
