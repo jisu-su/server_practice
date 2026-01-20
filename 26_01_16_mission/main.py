@@ -8,20 +8,20 @@ from data import maslow_data
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
-        # 만약 주소에 /delete 가 포함되어 있다면?
+        # 1. 삭제 요청 처리 (Delete)
         if "/delete" in self.path:
-        # 주소창에서 id=번호 부분만 잘라내기 (간단한 예시)
             try:
                 index = int(self.path.split("id=")[1])
-                del maslow_data[index] # 데이터 삭제! (Delete)
+                del maslow_data[index]
             except:
                 pass
+            
+            # 삭제 후 새로고침 효과 (Location 헤더로 재접속 유도)
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers()
+            return # 삭제 처리가 끝났으면 여기서 함수 종료!
         
-        # 삭제 후 다시 메인 화면으로 돌려보내기 (새로고침 효과)
-        self.send_response(303)
-        self.send_header('Location', '/')
-        self.end_headers()
-        return
         # 1. 고정된 상단 부분 (이미지 및 서론)
         header_html = """
         <h1>매슬로우의 욕구 이론</h1>
