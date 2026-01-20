@@ -31,7 +31,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 # 예: /create?stage=6단계&name=디지털욕구&content=연결되고싶다&example=폰,컴퓨터
                 query_string = self.path.split("?")[1]
                 # 외계어를 한국어로 해독하기
-                query_string = urllib.parse.unquote(query_string)
+                query_string = urllib.parse.unquote_plus(query_string)
                 params = query_string.split("&")
                 
                 # 각 정보를 딕셔너리로 조립하기 위해 데이터 추출
@@ -61,11 +61,21 @@ class MyHandler(BaseHTTPRequestHandler):
             <h2>단계 수정하기</h2>
             <form action="/update" method="GET">
                 <input type="hidden" name="id" value="{index}">
-                단계: <input type="text" name="stage" value="{item['stage']}"><br>
-                이름: <input type="text" name="name" value="{item['name']}"><br>
-                내용: <textarea name="content" style="vertical-align: top; resize: vertical; width: 300px; height: 100px;">{item['content']}</textarea>
-                예시: <textarea name="example" style="vertical-align: top; resize: vertical; width: 300px; height: 50px;">{item['example']}</textarea>
-                <button type="submit">수정 완료</button>
+
+                <p>단계: <input type="text" name="stage" value="{item['stage']}"></p>
+                <p>이름: <input type="text" name="name" value="{item['name']}"></p>
+
+                <p>
+                    <label style="vertical-align: top;">내용:</label>
+                    <textarea name="content" style="vertical-align: top; resize: none; width: 400px; height: 100px;">{item['content']}</textarea>
+                </p>
+
+                <p>
+                    <label style="vertical-align: top;">예시:</label>
+                    <textarea name="example" style="vertical-align: top; resize: none; width: 400px; height: 60px;">{item['example']}</textarea>
+                </p>
+
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">수정 완료</button>
             </form>
             <a href="/">취소</a>
             """
@@ -80,7 +90,7 @@ class MyHandler(BaseHTTPRequestHandler):
         if "/update" in self.path:
             try:
                 # 1. 주소창 정보 해독
-                query = urllib.parse.unquote(self.path.split("?")[1])
+                query = urllib.parse.unquote_plus(self.path.split("?")[1])
                 # 2. 정보들을 쪼개서 딕셔너리로 만들기
                 params = {}
                 for param in query.split("&"):
@@ -100,7 +110,7 @@ class MyHandler(BaseHTTPRequestHandler):
             # 4. 수정 완료 후 메인 화면으로 이동
             self.send_response(303)
             self.send_header('Location', '/')
-            self.end_headers
+            self.end_headers()
             return
 
         # 1. 고정된 상단 부분 (이미지 및 서론)
