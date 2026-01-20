@@ -8,54 +8,61 @@ from data import maslow_data
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
-        # 1. HTML 조립 (문자열 변수 만들기)
-        # 힌트: """ 이용하면 여러 줄의 HTML을 편하게 적을 수 있다.
-        # <script>태그 안에 console.log("응답을 받았습니다")를 꼭 넣기.
-        html_content = """
+        # 만약 주소에 /delete 가 포함되어 있다면?
+        if "/delete" in self.path:
+        # 주소창에서 id=번호 부분만 잘라내기 (간단한 예시)
+            try:
+                index = int(self.path.split("id=")[1])
+                del maslow_data[index] # 데이터 삭제! (Delete)
+            except:
+                pass
+        
+        # 삭제 후 다시 메인 화면으로 돌려보내기 (새로고침 효과)
+        self.send_response(303)
+        self.send_header('Location', '/')
+        self.end_headers()
+        return
+        # 1. 고정된 상단 부분 (이미지 및 서론)
+        header_html = """
+        <h1>매슬로우의 욕구 이론</h1>
+        <img src="https://blog.kakaocdn.net/dna/A0sr2/btrNhEwpdg0/AAAAAAAAAAAAAAAAAAAAAHUB9mV9cgjtg96elVmv82Z3iwRSd4iriM1fcF_shscA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=ArDLQZKX1ZwaQa3z85aSPpbmKG0%3D"
+            alt="매슬로우의 욕구 이론 5단계"
+            width="400">
+        <ul>
+            <li>인간의 다양한 욕구가 위계를 갖는다는 심리학적 관점</li>
+            <li>인간의 욕구를 생리적 욕구, 안전 욕구, 소속감과 사랑 욕구, 존중 욕구, 자아실현 욕구의 5단계 피라미드로 설명하며,<br>
+            하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
+        </ul>
+        <hr>
+        """
+            # 2. 데이터 기반으로 조립되는 부분 (동적)
+        stages_html = ""
+        for i, item in enumerate(maslow_data):
+            stages_html += f"""
+            <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+                <h2>{item['stage']}: {item['name']}</h2>
+                <p>{item['content']}</p>
+                <p><strong>예시: </strong>{item['example']}</p>
+                <a href="/delete?id={i}" style="color: red;">[이 단계 삭제하기]</a>
+            </div>
+            """
+
+        html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <title>매슬로우의 욕구 이론</title>
             <style>
-                body {
+                body {{
                     padding: 40px; /* 전체적으로 40px만큼 안쪽 여백을 줍니다 */
                     line-height: 1.6; /* 줄 간격도 조금 벌려주면 훨씬 읽기 편해요 */
-                }
+                }}
             </style>
-            <title>매슬로우의 욕구 이론</title>
         </head>
         <body>
-            <h1>매슬로우의 욕구 이론</h1>
-            <img src="https://blog.kakaocdn.net/dna/A0sr2/btrNhEwpdg0/AAAAAAAAAAAAAAAAAAAAAHUB9mV9cgjtg96elVmv82Z3iwRSd4iriM1fcF_shscA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=ArDLQZKX1ZwaQa3z85aSPpbmKG0%3D"
-                alt="매슬로우의 욕구 이론 5단계"
-                width="400">
-            <ul>
-                <li>인간의 다양한 욕구가 위계를 갖는다는 심리학적 관점</li>
-                <li>인간의 욕구를 생리적 욕구, 안전 욕구, 소속감과 사랑 욕구, 존중 욕구, 자아실현 욕구의 5단계 피라미드로 설명하며,<br>하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
-            </ul>
-            <hr>
-            """
-            # 2. 데이터 기반으로 조립되는 부분 (동적)
-        stages_html = ""
-        for item in maslow_data:
-            stages_html += f"""
-            <h2>{item['stage']},: {item['name']}</h2>
-            <p>{item['content']}</p>
-            <ul>
-                <li>예시: {item['example']}</li>
-            </ul>
-            """
-
-            <hr>
-            <h1>욕구 이론에 대한 나의 생각</h1>
-            <p>매슬로우 욕구 이론은 5단계로 나누어져 하위 욕구를 채워야만 상위 욕구로 나아갈 수 있다는 것이다. 
-            <br>욕구를 나눈 큰 틀에 있어서는 많은 부분 동의한다. 그리고 생리적 욕구가 무조건 기초, 첫번째가 되어야 한다는 것도 전적으로 동의한다. 하지만 이 이론이 나온 것이 1940년대인 것을 생각하면 역시 현대와는 맞지 않다고 생각한다. 
-            <br>이 이론을 읽으면서 한 가지 생각이 났다. 불우한 환경에서 자란 사람들 중 몇 몇은 자신의 환경을 벗어나기 위해서 엄청난 노력을 한다. 내 생각에 그 사람들은 안전 욕구, 애정·소속 욕구, 존중 욕구에 대해서는 충분한 만족감을 느끼지 못 할 것이다. 그럼에도 그들은 환경을 벗어나려는 결핍 욕구와 그 속에서 성공하려는 자신의 자아 실현 욕구가 동시에 발현된다. 
-            <br>현 시대에서 분명한 것은 욕구가 한 단계, 한 단계 일어나는 것이 아닌 피라미드와 상관 없이 복합적으로 일어난다는 것이다. 또한 본인의 욕구로 우선 순위가 바뀌기도 한다. 요즘 안전을 포기하고, 남들의 시선을 신경 쓰지 않고 본인의 자아 실현만을 위해 행동하는 사람들을 찾아 보기 정말 쉽다. 
-            <br>이처럼 매슬로우의 욕구 이론은 현대와 어울린다고 하기에는 조금 무리가 있다.</p>
-            <hr>
-            <h2>출처</h2>
-            <p>이미지 출처: <a href="https://pals.tistory.com/2523" target="_blank">티스토리 바로가기</a></p>
-            <p>내용 출처: <a href="https://ko.wikipedia.org/wiki/%EB%A7%A4%EC%8A%AC%EB%A1%9C%EC%9D%98_%EC%9A%95%EA%B5%AC%EB%8B%A8%EA%B3%84%EC%9D%B4%EB%A1%A0" target="_blank">위키백과 바로가기</a></p>
+            {header_html}
+            {stages_html}
         </body>
         </html>
         """
