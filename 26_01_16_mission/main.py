@@ -2,13 +2,15 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 # data.py에서 maslow_data 가져오기
 from data import maslow_data 
+# urllib.parse 쓰기
+import urllib.parse
 
 # 2. 요청을 처리할 점원(Handler) 클래스 만들기
 #    (힌트: BaseHTTPRequestHandler를 상속받아야 해요)
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
-        # 1. 삭제 요청 처리 (Delete)
+        # 1. [Delete] 삭제 요청 처리
         if "/delete" in self.path:
             try:
                 index = int(self.path.split("id=")[1])
@@ -22,20 +24,20 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return # 삭제 처리가 끝났으면 여기서 함수 종료!
         
-        # [Create] 새로운 단계 추가 로직 (새로 추가!)
+        # [Create] 새로운 단계 추가 로직
         if "/create" in self.path:
             try:
                 # 1. 주소창에서 정보들 쪼개기
                 # 예: /create?stage=6단계&name=디지털욕구&content=연결되고싶다&example=폰,컴퓨터
                 query_string = self.path.split("?")[1]
+                # 외계어를 한국어로 해독하기
+                query_string = urllib.parse.unquote(query_string)
                 params = query_string.split("&")
                 
                 # 각 정보를 딕셔너리로 조립하기 위해 데이터 추출
                 new_data = {}
                 for param in params:
                     key, value = param.split("=")
-                    # URL 특수문자 처리를 위해 간단히 설명하면, 
-                    # 한글이 깨질 수 있으니 일단 영어나 간단한 한글로 테스트해보세요!
                     new_data[key] = value
                 
                 # 2. 리스트에 추가 (이게 핵심 Create!)
@@ -50,13 +52,37 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         
+        # [Update] 수정 요청 처리
+        if "/edit" in self.path:
+            index = int(self.path.split("id=")[1])
+            item = maslow_data[index]
+        
+            edit_html = f"""
+            <h2>단계 수정하기</h2>
+            <form action="/update" method="GET">
+                <input type="hidden" name="id" value="{index}">
+                단계: <input type="text" name="stage" value="{item['stage']}"><br>
+                이름: <input type="text" name="name" value="{item['name']}"><br>
+                내용: <textarea name="content">{item['content']}</textarea><br>
+                예시: <input type="text" name="example" value="{item['example']}"><br>
+                <button type="submit">수정 완료</button>
+            </form>
+            <a href="/">취소</a>
+            """
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.end_headers
+            self.wfile.write(edit_html.encode('utf-8'))
+            return
+
         # 1. 고정된 상단 부분 (이미지 및 서론)
         header_html = """
         <h1>매슬로우의 욕구 이론</h1>
         <img src="https://blog.kakaocdn.net/dna/A0sr2/btrNhEwpdg0/AAAAAAAAAAAAAAAAAAAAAHUB9mV9cgjtg96elVmv82Z3iwRSd4iriM1fcF_shscA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=ArDLQZKX1ZwaQa3z85aSPpbmKG0%3D"
             alt="매슬로우의 욕구 이론 5단계"
             width="400">
-        <ul>
+        <ul>`
             <li>인간의 다양한 욕구가 위계를 갖는다는 심리학적 관점</li>
             <li>인간의 욕구를 생리적 욕구, 안전 욕구, 소속감과 사랑 욕구, 존중 욕구, 자아실현 욕구의 5단계 피라미드로 설명하며,<br>
             하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
@@ -77,8 +103,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 <input type="text" name="example" placeholder="예시 (예: 5G, 무료 와이파이)" style="width: 100%;">
                 <br><br>
                 <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">
-                    피라미드에 추가하기
-                </button>
+                    피라미드에 추가하기</button>
             </form>
         </div>
         """
@@ -90,7 +115,8 @@ class MyHandler(BaseHTTPRequestHandler):
                 <h2>{item['stage']}: {item['name']}</h2>
                 <p>{item['content']}</p>
                 <p><strong>예시: </strong>{item['example']}</p>
-                <a href="/delete?id={i}" style="color: red;">[이 단계 삭제하기]</a>
+                <a href="/delete?id={i}" style="color: red;">[삭제하기]</a>
+                <a href="/edit?id={i}" style="color: blue; margin-left: 10px;">[수정하기]</a>
             </div>
             """
 
@@ -109,6 +135,7 @@ class MyHandler(BaseHTTPRequestHandler):
         </head>
         <body>
             {header_html}
+            {create_form_html}
             {stages_html}
         </body>
         </html>
