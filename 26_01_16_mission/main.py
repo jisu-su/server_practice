@@ -64,7 +64,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 단계: <input type="text" name="stage" value="{item['stage']}"><br>
                 이름: <input type="text" name="name" value="{item['name']}"><br>
                 내용: <textarea name="content" style="vertical-align: top; resize: vertical; width: 300px; height: 100px;">{item['content']}</textarea>
-                예시: <input type="text" name="example" value="{item['example']}"><br>
+                예시: <textarea name="example" style="vertical-align: top; resize: vertical; width: 300px; height: 50px;">{item['example']}</textarea>
                 <button type="submit">수정 완료</button>
             </form>
             <a href="/">취소</a>
