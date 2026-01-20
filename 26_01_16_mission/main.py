@@ -63,7 +63,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 <input type="hidden" name="id" value="{index}">
                 단계: <input type="text" name="stage" value="{item['stage']}"><br>
                 이름: <input type="text" name="name" value="{item['name']}"><br>
-                내용: <textarea name="content">{item['content']}</textarea><br>
+                내용: <textarea name="content" style="vertical-align: top; resize: vertical; width: 300px; height: 100px;">{item['content']}</textarea>
                 예시: <input type="text" name="example" value="{item['example']}"><br>
                 <button type="submit">수정 완료</button>
             </form>
@@ -125,7 +125,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 <input type="text" name="stage" placeholder="예: 6단계" style="width: 100px;">
                 <input type="text" name="name" placeholder="욕구 이름 (예: 와이파이 욕구)">
                 <br><br>
-                <textarea name="content" placeholder="이 욕구에 대한 설명을 적어주세요" style="width: 100%; height: 60px;"></textarea>
+                <textarea name="content" placeholder="이 욕구에 대한 설명을 적어주세요" style="width: 100%; height: 60px; resize: none;"></textarea>
                 <br><br>
                 <input type="text" name="example" placeholder="예시 (예: 5G, 무료 와이파이)" style="width: 100%;">
                 <br><br>
