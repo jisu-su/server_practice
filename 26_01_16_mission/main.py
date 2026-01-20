@@ -72,8 +72,35 @@ class MyHandler(BaseHTTPRequestHandler):
 
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.end_headers
+            self.end_headers()
             self.wfile.write(edit_html.encode('utf-8'))
+            return
+        
+        # [Update] 실제로 데이터를 수정하는 로직
+        if "/update" in self.path:
+            try:
+                # 1. 주소창 정보 해독
+                query = urllib.parse.unquote(self.path.split("?")[1])
+                # 2. 정보들을 쪼개서 딕셔너리로 만들기
+                params = {}
+                for param in query.split("&"):
+                    key, value = param.split("=")
+                    params[key] = value
+                # 3. 해당 번호(index)의 데이터를 새 내용으로 교체!
+                idx = int(params['id'])
+                maslow_data[idx] = {
+                    'stage': params['stage'],
+                    'name': params['name'],
+                    'content': params['content'],
+                    'example': params['example']
+                }
+            except:
+                pass
+
+            # 4. 수정 완료 후 메인 화면으로 이동
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers
             return
 
         # 1. 고정된 상단 부분 (이미지 및 서론)
