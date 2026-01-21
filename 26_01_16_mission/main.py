@@ -147,6 +147,11 @@ class MyHandler(BaseHTTPRequestHandler):
             # 2. 데이터 기반으로 조립되는 부분 (동적)
         stages_html = ""
         for i, item in enumerate(maslow_data):
+
+            delete_button = ""
+            if i != 0:
+                delete_button = f'<a href="/delete?id={i}" style="color: red;">[삭제하기]</a>'
+            
             exams = ""
             for ex in item["example"].split(","):
                 exams += f"<li>{ex.strip()}</li>" 
@@ -155,8 +160,8 @@ class MyHandler(BaseHTTPRequestHandler):
             <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
                 <h2>{item['stage']}: {item['name']}</h2>
                 <p>{item['content']}</p>
-                <p><strong>예시: {exams}</strong>p>
-                <a href="/delete?id={i}" style="color: red;">[삭제하기]</a>
+                <p><strong>예시: {exams}</strong></p>
+                {delete_button}
                 <a href="/edit?id={i}" style="color: blue; margin-left: 10px;">[수정하기]</a>
             </div>
             """
