@@ -119,7 +119,7 @@ class MyHandler(BaseHTTPRequestHandler):
         <img src="https://blog.kakaocdn.net/dna/A0sr2/btrNhEwpdg0/AAAAAAAAAAAAAAAAAAAAAHUB9mV9cgjtg96elVmv82Z3iwRSd4iriM1fcF_shscA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=ArDLQZKX1ZwaQa3z85aSPpbmKG0%3D"
             alt="매슬로우의 욕구 이론 5단계"
             width="400">
-        <ul>`
+        <ul>
             <li>인간의 다양한 욕구가 위계를 갖는다는 심리학적 관점</li>
             <li>인간의 욕구를 생리적 욕구, 안전 욕구, 소속감과 사랑 욕구, 존중 욕구, 자아실현 욕구의 5단계 피라미드로 설명하며,<br>
             하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
@@ -147,11 +147,15 @@ class MyHandler(BaseHTTPRequestHandler):
             # 2. 데이터 기반으로 조립되는 부분 (동적)
         stages_html = ""
         for i, item in enumerate(maslow_data):
+            exams = ""
+            for ex in item["example"].split(","):
+                exams += f"<li>{ex.strip()}</li>" 
+            exams = f"<ul>{exams}</ul>"
             stages_html += f"""
             <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
                 <h2>{item['stage']}: {item['name']}</h2>
                 <p>{item['content']}</p>
-                <p><strong>예시: </strong>{item['example']}</p>
+                <p><strong>예시: {exams}</strong>p>
                 <a href="/delete?id={i}" style="color: red;">[삭제하기]</a>
                 <a href="/edit?id={i}" style="color: blue; margin-left: 10px;">[수정하기]</a>
             </div>
