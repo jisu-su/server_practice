@@ -1,0 +1,20 @@
+            <h2>단계 수정하기</h2>
+            <form action="/update" method="GET">
+                <input type="hidden" name="id" value="{index}">
+
+                <p>단계: <input type="text" name="stage" value="{item['stage']}"></p>
+                <p>이름: <input type="text" name="name" value="{item['name']}"></p>
+
+                <p>
+                    <label style="vertical-align: top;">내용:</label>
+                    <textarea name="content" style="vertical-align: top; resize: none; width: 400px; height: 100px;">{item['content']}</textarea>
+                </p>
+
+                <p>
+                    <label style="vertical-align: top;">예시:</label>
+                    <textarea name="example" style="vertical-align: top; resize: none; width: 400px; height: 60px;">{item['example']}</textarea>
+                </p>
+
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">수정 완료</button>
+            </form>
+            <a href="/">취소</a>
