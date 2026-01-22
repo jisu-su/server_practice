@@ -18,6 +18,7 @@ class MyHandler(BaseHTTPRequestHandler):
             header_design = f.read()
         with open("create_form.html", "r", encoding="utf-8") as f:
             form_design = f.read()
+
         # 1. [Delete] 삭제 요청 처리
         if "/delete" in self.path:
             try:
@@ -77,7 +78,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.end_headers()
-            self.wfile.write(edit_design.encode('utf-8'))
+            self.wfile.write(final_edit_html.encode('utf-8'))
             return
         
         # [Update] 실제로 데이터를 수정하는 로직
@@ -107,6 +108,10 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         
+        # stages_html 불러오기
+        with open("stages.html", "r", encoding="utf-8") as f:
+            stages_design = f.read()
+
             # 2. 데이터 기반으로 조립되는 부분 (동적)
         stages_html = ""
         for i, item in enumerate(maslow_data):
@@ -115,20 +120,21 @@ class MyHandler(BaseHTTPRequestHandler):
             if i != 0:
                 delete_button = f'<a href="/delete?id={i}" style="color: red;">[삭제하기]</a>'
             
-            exams = ""
-            for ex in item["example"].split(","):
-                exams += f"<li>{ex.strip()}</li>" 
-            exams = f"<ul>{exams}</ul>"
-            
-            stages_html += f"""
-            <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
-                <h2>{item['stage']}: {item['name']}</h2>
-                <p>{item['content']}</p>
-                <p><strong>예시: {exams}</strong></p>
-                {delete_button}
-                <a href="/edit?id={i}" style="color: blue; margin-left: 10px;">[수정하기]</a>
-            </div>
-            """
+            # 예시 리스트 만드는 로직도 파이썬이 처리
+            exams = "".join([f"<li>{ex.strip()}</li>" for ex in item["example"].split(",")])
+            exams_html = f"<ul>{exams}</ul>"
+
+            # 읽어온 stages.html 데이터 채우기
+            one_stage = stages_design.replace("{{id}}", str(i))
+            one_stage = one_stage.replace("{{stage}}", item['stage'])
+            one_stage = one_stage.replace("{{name}}", item['name'])
+            one_stage = one_stage.replace("{{content}}", item['content'])
+            one_stage = one_stage.replace("{{exams}}", exams_html)
+            one_stage = one_stage.replace("{{delete_button}}", delete_button)
+
+            #조립된 것들 전체 결과에 넣기
+            stages_html += one_stage
+
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
