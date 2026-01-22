@@ -171,7 +171,9 @@ class MyHandler(BaseHTTPRequestHandler):
             """
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
-        final_html = html_design.replace("{{stages_html}}", stages_html)
+        final_html = html_design.replace("{header_html}", header_html)
+        final_html = final_html.replace("{create_form_html}", create_form_html)
+        final_html = final_html.replace("{{stages_html}}", stages_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
