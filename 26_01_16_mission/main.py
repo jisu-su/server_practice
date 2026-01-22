@@ -11,6 +11,7 @@ import urllib.parse
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
+        global maslow_data
         # html 파일 불러오기
         with open("index.html", "r", encoding="utf-8") as f:
             index_design = f.read()
@@ -22,8 +23,8 @@ class MyHandler(BaseHTTPRequestHandler):
         # 1. [Delete] 삭제 요청 처리
         if "/delete" in self.path:
             try:
-                index = int(self.path.split("id=")[1])
-                del maslow_data[index]
+                target_id = int(self.path.split("id=")[1])
+                maslow_data = [item for item in maslow_data if item['id'] != target_id]
             except:
                 pass
             
@@ -35,55 +36,60 @@ class MyHandler(BaseHTTPRequestHandler):
         
         # [Create] 새로운 단계 추가 로직
         if "/create" in self.path:
-            try:
-                # 1. 주소창에서 정보들 쪼개기
+                # 1. 주소창에서 정보들 쪼개기, 외계어를 한국어로 해독하기
                 # 예: /create?stage=6단계&name=디지털욕구&content=연결되고싶다&example=폰,컴퓨터
-                query_string = self.path.split("?")[1]
-                # 외계어를 한국어로 해독하기
-                query_string = urllib.parse.unquote_plus(query_string)
-                params = query_string.split("&")
-                
-                # 각 정보를 딕셔너리로 조립하기 위해 데이터 추출
-                new_data = {}
-                for param in params:
+                query_string = urllib.parse.unquote_plus(self.path.split("?")[1])
+
+                params = {}
+                for param in query_string.split("&"):
                     key, value = param.split("=")
-                    new_data[key] = value
+                    params[key] = value
                 
+                if len(maslow_data) > 0 :
+                    new_id = max(item['id'] for item in maslow_data) +1
+                else:
+                    new_id = 1
+
+                new_data = {
+                    "id": new_id,
+                    "stage": params['stage'],
+                    "name": params['name'],
+                    "content": params['content'],
+                    "example": params['example']
+                }
                 # 2. 리스트에 추가 (이게 핵심 Create!)
                 maslow_data.append(new_data)
-                
-            except:
-                pass
+
             
-            # 3. 추가했으니 다시 메인화면으로!
-            self.send_response(303)
-            self.send_header('Location', '/')
-            self.end_headers()
-            return
+                # 3. 추가했으니 다시 메인화면으로!
+                self.send_response(303)
+                self.send_header('Location', '/')
+                self.end_headers()
+                return
         
         # [Update] 수정 요청 처리
         if "/edit" in self.path:
-            index = int(self.path.split("id=")[1])
-            item = maslow_data[index]
+            target_id = int(self.path.split("id=")[1])
+            for item in maslow_data:
+                if target_id == item['id']:
 
-            with open("edit.html", "r", encoding="utf-8") as f:
-                edit_design = f.read()
+                    with open("edit.html", "r", encoding="utf-8") as f:
+                        edit_design = f.read()
 
-            final_edit_html = edit_design.replace("{{edit_id}}", str(index))
-            final_edit_html = final_edit_html.replace("{{edit_stage}}", item['stage'])
-            final_edit_html = final_edit_html.replace("{{edit_name}}", item['name'])
-            final_edit_html = final_edit_html.replace("{{edit_content}}", item['content'])
-            final_edit_html = final_edit_html.replace("{{edit_example}}", item['example'])
+                    final_edit_html = edit_design.replace("{{edit_id}}", str(item['id']))
+                    final_edit_html = final_edit_html.replace("{{edit_stage}}", item['stage'])
+                    final_edit_html = final_edit_html.replace("{{edit_name}}", item['name'])
+                    final_edit_html = final_edit_html.replace("{{edit_content}}", item['content'])
+                    final_edit_html = final_edit_html.replace("{{edit_example}}", item['example'])
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(final_edit_html.encode('utf-8'))
-            return
-        
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/html; charset=utf-8')
+                    self.end_headers()
+                    self.wfile.write(final_edit_html.encode('utf-8'))
+                    return
+            
         # [Update] 실제로 데이터를 수정하는 로직
         if "/update" in self.path:
-            try:
                 # 1. 주소창 정보 해독
                 query = urllib.parse.unquote_plus(self.path.split("?")[1])
                 # 2. 정보들을 쪼개서 딕셔너리로 만들기
@@ -91,22 +97,22 @@ class MyHandler(BaseHTTPRequestHandler):
                 for param in query.split("&"):
                     key, value = param.split("=")
                     params[key] = value
-                # 3. 해당 번호(index)의 데이터를 새 내용으로 교체!
-                idx = int(params['id'])
-                maslow_data[idx] = {
-                    'stage': params['stage'],
-                    'name': params['name'],
-                    'content': params['content'],
-                    'example': params['example']
-                }
-            except:
-                pass
+                # 주소창에서 id 추출
+                target_id = int(params['id'])
 
-            # 4. 수정 완료 후 메인 화면으로 이동
-            self.send_response(303)
-            self.send_header('Location', '/')
-            self.end_headers()
-            return
+                for item in maslow_data:
+                    if item['id'] == target_id:
+                        item['stage'] = params['stage']
+                        item['name'] = params['name']
+                        item['content'] = params['content']
+                        item['example'] = params['example']
+                        break # 찾았으니 더 안 돌고 끝내기
+
+                # 4. 수정 완료 후 메인 화면으로 이동
+                self.send_response(303)
+                self.send_header('Location', '/')
+                self.end_headers()
+                return
         
         # stages_html 불러오기
         with open("stages.html", "r", encoding="utf-8") as f:
@@ -118,14 +124,14 @@ class MyHandler(BaseHTTPRequestHandler):
 
             delete_button = ""
             if i != 0:
-                delete_button = f'<a href="/delete?id={i}" style="color: red;">[삭제하기]</a>'
+                delete_button = f'<a href="/delete?id={item['id']}" style="color: red;">[삭제하기]</a>'
             
             # 예시 리스트 만드는 로직도 파이썬이 처리
             exams = "".join([f"<li>{ex.strip()}</li>" for ex in item["example"].split(",")])
             exams_html = f"<ul>{exams}</ul>"
 
             # 읽어온 stages.html 데이터 채우기
-            one_stage = stages_design.replace("{{id}}", str(i))
+            one_stage = stages_design.replace("{{id}}", str(item['id']))
             one_stage = one_stage.replace("{{stage}}", item['stage'])
             one_stage = one_stage.replace("{{name}}", item['name'])
             one_stage = one_stage.replace("{{content}}", item['content'])
