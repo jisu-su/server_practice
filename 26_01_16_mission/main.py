@@ -68,11 +68,11 @@ class MyHandler(BaseHTTPRequestHandler):
             with open("edit.html", "r", encoding="utf-8") as f:
                 edit_design = f.read()
 
-            final_edit_html = edit_design.replace("{{index}}", str(index))
-            final_edit_html = final_edit_html.replace("{{item['stage']}}", item['stage'])
-            final_edit_html = final_edit_html.replace("{{item['name']}}", item['name'])
-            final_edit_html = final_edit_html.replace("{{item['content']}}", item['content'])
-            final_edit_html = final_edit_html.replace("{{item[example]}}", item['example'])
+            final_edit_html = edit_design.replace("{{edit_id}}", str(index))
+            final_edit_html = final_edit_html.replace("{{edit_stage}}", item['stage'])
+            final_edit_html = final_edit_html.replace("{{edit_name}}", item['name'])
+            final_edit_html = final_edit_html.replace("{{edit_content}}", item['content'])
+            final_edit_html = final_edit_html.replace("{{edit_example}}", item['example'])
 
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
