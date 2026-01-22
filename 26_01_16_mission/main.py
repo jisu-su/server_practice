@@ -5,14 +5,19 @@ from data import maslow_data
 # urllib.parse 쓰기
 import urllib.parse
 # html 파일 불러오기
-with open("index.html", "r", encoding="utf-8") as f:
-    html_design = f.read()
 
 # 2. 요청을 처리할 점원(Handler) 클래스 만들기
 #    (힌트: BaseHTTPRequestHandler를 상속받아야 해요)
 class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
+        # html 파일 불러오기
+        with open("index.html", "r", encoding="utf-8") as f:
+            index_design = f.read()
+        with open("header.html", "r", encoding="utf-8") as f:
+            header_design = f.read()
+        with open("create_form.html", "r", encoding="utf-8") as f:
+            form_design = f.read()
         # 1. [Delete] 삭제 요청 처리
         if "/delete" in self.path:
             try:
@@ -59,34 +64,20 @@ class MyHandler(BaseHTTPRequestHandler):
         if "/edit" in self.path:
             index = int(self.path.split("id=")[1])
             item = maslow_data[index]
-        
-            edit_html = f"""
-            <h2>단계 수정하기</h2>
-            <form action="/update" method="GET">
-                <input type="hidden" name="id" value="{index}">
 
-                <p>단계: <input type="text" name="stage" value="{item['stage']}"></p>
-                <p>이름: <input type="text" name="name" value="{item['name']}"></p>
+            with open("edit.html", "r", encoding="utf-8") as f:
+                edit_design = f.read()
 
-                <p>
-                    <label style="vertical-align: top;">내용:</label>
-                    <textarea name="content" style="vertical-align: top; resize: none; width: 400px; height: 100px;">{item['content']}</textarea>
-                </p>
-
-                <p>
-                    <label style="vertical-align: top;">예시:</label>
-                    <textarea name="example" style="vertical-align: top; resize: none; width: 400px; height: 60px;">{item['example']}</textarea>
-                </p>
-
-                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">수정 완료</button>
-            </form>
-            <a href="/">취소</a>
-            """
+            final_edit_html = edit_design.replace("{{index}}", str(index))
+            final_edit_html = final_edit_html.replace("{{item['stage']}}", item['stage'])
+            final_edit_html = final_edit_html.replace("{{item['name']}}", item['name'])
+            final_edit_html = final_edit_html.replace("{{item['content']}}", item['content'])
+            final_edit_html = final_edit_html.replace("{{item[example]}}", item['example'])
 
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.end_headers()
-            self.wfile.write(edit_html.encode('utf-8'))
+            self.wfile.write(edit_design.encode('utf-8'))
             return
         
         # [Update] 실제로 데이터를 수정하는 로직
@@ -115,38 +106,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Location', '/')
             self.end_headers()
             return
-
-        # 1. 고정된 상단 부분 (이미지 및 서론)
-        header_html = """
-        <h1>매슬로우의 욕구 이론</h1>
-        <img src="https://blog.kakaocdn.net/dna/A0sr2/btrNhEwpdg0/AAAAAAAAAAAAAAAAAAAAAHUB9mV9cgjtg96elVmv82Z3iwRSd4iriM1fcF_shscA/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1769871599&allow_ip=&allow_referer=&signature=ArDLQZKX1ZwaQa3z85aSPpbmKG0%3D"
-            alt="매슬로우의 욕구 이론 5단계"
-            width="400">
-        <ul>
-            <li>인간의 다양한 욕구가 위계를 갖는다는 심리학적 관점</li>
-            <li>인간의 욕구를 생리적 욕구, 안전 욕구, 소속감과 사랑 욕구, 존중 욕구, 자아실현 욕구의 5단계 피라미드로 설명하며,<br>
-            하위 욕구가 충족되어야 상위 욕구를 추구하게 되는 동기 부여 원리이다.</li>
-        </ul>
-        <hr>
-        """
-
-        # Create를 위한 입력 양식 
-        create_form_html = """
-        <div style="background-color: #f9f9f9; padding: 20px; border: 2px dashed #ccc; margin-bottom: 30px;">
-            <h3>새로운 욕구 단계 등록하기</h3>
-            <form action="/create" method="GET">
-                <input type="text" name="stage" placeholder="예: 6단계" style="width: 100px;">
-                <input type="text" name="name" placeholder="욕구 이름 (예: 와이파이 욕구)">
-                <br><br>
-                <textarea name="content" placeholder="이 욕구에 대한 설명을 적어주세요" style="width: 100%; height: 60px; resize: none;"></textarea>
-                <br><br>
-                <input type="text" name="example" placeholder="예시 (예: 5G, 무료 와이파이)" style="width: 100%;">
-                <br><br>
-                <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">
-                    피라미드에 추가하기</button>
-            </form>
-        </div>
-        """
+        
             # 2. 데이터 기반으로 조립되는 부분 (동적)
         stages_html = ""
         for i, item in enumerate(maslow_data):
@@ -171,8 +131,8 @@ class MyHandler(BaseHTTPRequestHandler):
             """
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
-        final_html = html_design.replace("{header_html}", header_html)
-        final_html = final_html.replace("{create_form_html}", create_form_html)
+        final_html = index_design.replace("{header_html}", header_design)
+        final_html = final_html.replace("{create_form_html}", form_design)
         final_html = final_html.replace("{{stages_html}}", stages_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
