@@ -4,6 +4,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from data import maslow_data 
 # urllib.parse 쓰기
 import urllib.parse
+# html 파일 불러오기
+with open("index.html", "r", encoding="utf-8") as f:
+    html_design = f.read()
 
 # 2. 요청을 처리할 점원(Handler) 클래스 만들기
 #    (힌트: BaseHTTPRequestHandler를 상속받아야 해요)
@@ -156,6 +159,7 @@ class MyHandler(BaseHTTPRequestHandler):
             for ex in item["example"].split(","):
                 exams += f"<li>{ex.strip()}</li>" 
             exams = f"<ul>{exams}</ul>"
+            
             stages_html += f"""
             <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
                 <h2>{item['stage']}: {item['name']}</h2>
@@ -166,26 +170,8 @@ class MyHandler(BaseHTTPRequestHandler):
             </div>
             """
 
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>매슬로우의 욕구 이론</title>
-            <style>
-                body {{
-                    padding: 40px; /* 전체적으로 40px만큼 안쪽 여백을 줍니다 */
-                    line-height: 1.6; /* 줄 간격도 조금 벌려주면 훨씬 읽기 편해요 */
-                }}
-            </style>
-        </head>
-        <body>
-            {header_html}
-            {create_form_html}
-            {stages_html}
-        </body>
-        </html>
-        """
+        # 구멍 뚫어놓은 곳에 데이터 채우기
+        final_html = html_design.replace("{{stages_html}}", stages_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
@@ -194,7 +180,7 @@ class MyHandler(BaseHTTPRequestHandler):
         # 4. 헤더 작성 끝내기
         self.end_headers()
         # 5. HTML 전송 (문자열을 바이트로 변환해서!)
-        self.wfile.write(html_content.encode('utf-8'))
+        self.wfile.write(final_html.encode('utf-8'))
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
