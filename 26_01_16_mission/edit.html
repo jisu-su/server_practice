@@ -1,9 +1,9 @@
             <h2>단계 수정하기</h2>
             <form action="/update" method="GET">
-                <input type="hidden" name="id" value="{index}">
+                <input type="hidden" name="id" value="{{index}}">
 
-                <p>단계: <input type="text" name="stage" value="{item['stage']}"></p>
-                <p>이름: <input type="text" name="name" value="{item['name']}"></p>
+                <p>단계: <input type="text" name="stage" value="{{item['stage']}}"></p>
+                <p>이름: <input type="text" name="name" value="{{item['name']}}"></p>
 
                 <p>
                     <label style="vertical-align: top;">내용:</label>
