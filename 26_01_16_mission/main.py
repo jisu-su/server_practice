@@ -4,8 +4,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from data import maslow_data 
 # urllib.parse 쓰기
 import urllib.parse
-# html 파일 불러오기
 
+comment_list = []
 # 2. 요청을 처리할 점원(Handler) 클래스 만들기
 #    (힌트: BaseHTTPRequestHandler를 상속받아야 해요)
 class MyHandler(BaseHTTPRequestHandler):
@@ -155,6 +155,24 @@ class MyHandler(BaseHTTPRequestHandler):
         self.end_headers()
         # 5. HTML 전송 (문자열을 바이트로 변환해서!)
         self.wfile.write(final_html.encode('utf-8'))
+
+    # POST 함수 만들기
+    def do_POST(self):
+        # 들어온 데이터의 전체 길이가 얼마인지 읽어 오기 
+        self.headers.get('Content-Length')
+        number_of_letter = int(self.headers.get('Content-Length'))
+        # 데이터 꺼내기
+        comment = self.rfile.read(number_of_letter)
+        # 읽은 데이터를 한글 문자열로 변환
+        comments = comment.decode('utf-8')
+        # 변환된 문자열에서 실제 필요한 값만 뽑아내어 리스트에 추가 - 필터링
+        result = urllib.parse.unquote_plus(comments.split("=")[1])
+        comment_list.append(result)
+
+        # 작업이 끝나면 리다이렉트를 사용해 메인 화면으로 돌려보내기
+        self.send_response(303)
+        self.send_header('Location', '/')
+        self.end_headers()
 
 # 3. 서버 설정 (주소는 'localhost', 포트는 8000)
 host = "localhost"
