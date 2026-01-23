@@ -19,6 +19,8 @@ class MyHandler(BaseHTTPRequestHandler):
             header_design = f.read()
         with open("create_form.html", "r", encoding="utf-8") as f:
             form_design = f.read()
+        with open("comment_form.html", "r", encoding="utf-8") as f:
+            comment_design = f.read()
 
         # 1. [Delete] 삭제 요청 처리
         if "/delete" in self.path:
@@ -141,11 +143,18 @@ class MyHandler(BaseHTTPRequestHandler):
             #조립된 것들 전체 결과에 넣기
             stages_html += one_stage
 
+        # 댓글 리스트 html로 변환하기
+        comment_list_html = ""
+        for msg in comment_list:
+            # f-string을 사용해 실제 댓글 내용인 msg를 <p> 태그 사이에 넣는다.
+            comment_list_html += f"<p style='border-bottom: 1px solid #eee; padding: 5px;'>{msg}</p>"
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
         final_html = final_html.replace("{create_form_html}", form_design)
         final_html = final_html.replace("{{stages_html}}", stages_html)
+        final_html = final_html.replace("{comment_form_html}", comment_design)
+        final_html = final_html.replace("{{comment_list_html}}", comment_list_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
