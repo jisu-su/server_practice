@@ -145,9 +145,15 @@ class MyHandler(BaseHTTPRequestHandler):
 
         # 댓글 리스트 html로 변환하기
         comment_list_html = ""
-        for msg in comment_list:
-            # f-string을 사용해 실제 댓글 내용인 msg를 <p> 태그 사이에 넣는다.
-            comment_list_html += f"<p style='border-bottom: 1px solid #eee; padding: 5px;'>{msg}</p>"
+        # enumerate를 사용하면 msg(내용)와 i(번호)를 동시에 얻을 수 있다.
+        for i, msg in enumerate(comment_list):
+            # 1. 삭제 버튼을 위한 HTML 코드를 만들자.
+            # 링크 주소는 "/delete_comment?index=" 뒤에 숫자 i가 붙도록 설정한다.
+            # 예: f'<a href="/delete_comment?index={i}">[삭제]</a>'
+            delete_comment_button = f'<a href="/delete_comment?index{i}">[삭제하기]</a>'
+
+            # f-string을 사용해 실제 댓글 내용인 msg와 삭제 버튼을 <p> 태그 사이에 넣는다.
+            comment_list_html += f"<p style='border-bottom: 1px solid #eee; padding: 5px;'>{msg}{delete_comment_button}</p>"
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
