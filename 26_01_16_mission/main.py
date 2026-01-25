@@ -36,6 +36,26 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return # 삭제 처리가 끝났으면 여기서 함수 종료!
         
+        # [Comment Delete] 댓글 삭제 요청 처리
+        if "/delete_comment" in self.path:
+            try:
+                # 1. self.path에서 "index=" 뒷부분을 잘라내어 숫자로 변환하자.
+                # 기존 삭제 로직에서 target_id를 가져왔던 방식과 비슷하다.
+                comment_index = int(self.path.split("index=")[1])
+
+                # 2. comment_list 리스트에서 해당 번호(index)의 요소를 삭제해라.
+                # del comment_list[번호] 또는 comment_list.pop(번호)를 사용한다.
+                del comment_list[comment_index]
+
+            except:
+                pass
+
+            # 3. 삭제가 끝났으면 다시 메인 화면('/')으로 새로고침(Redirect)하기.
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers()
+            return
+        
         # [Create] 새로운 단계 추가 로직
         if "/create" in self.path:
                 # 1. 주소창에서 정보들 쪼개기, 외계어를 한국어로 해독하기
