@@ -170,7 +170,7 @@ class MyHandler(BaseHTTPRequestHandler):
             # 1. 삭제 버튼을 위한 HTML 코드를 만들자.
             # 링크 주소는 "/delete_comment?index=" 뒤에 숫자 i가 붙도록 설정한다.
             # 예: f'<a href="/delete_comment?index={i}">[삭제]</a>'
-            delete_comment_button = f'<a href="/delete_comment?index{i}">[삭제하기]</a>'
+            delete_comment_button = f'<a href="/delete_comment?index={i}">[삭제하기]</a>'
 
             # f-string을 사용해 실제 댓글 내용인 msg와 삭제 버튼을 <p> 태그 사이에 넣는다.
             comment_list_html += f"<p style='border-bottom: 1px solid #eee; padding: 5px;'>{msg}{delete_comment_button}</p>"
