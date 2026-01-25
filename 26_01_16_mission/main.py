@@ -12,6 +12,7 @@ class MyHandler(BaseHTTPRequestHandler):
     # GET 요청을 처리하는 함수 정의하기
     def do_GET(self):
         global maslow_data
+        global comment_list
         # html 파일 불러오기
         with open("index.html", "r", encoding="utf-8") as f:
             index_design = f.read()
@@ -178,9 +179,9 @@ class MyHandler(BaseHTTPRequestHandler):
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
         final_html = final_html.replace("{create_form_html}", form_design)
-        final_html = final_html.replace("{{stages_html}}", stages_html)
+        final_html = final_html.replace("{stages_html}", stages_html)
         final_html = final_html.replace("{comment_form_html}", comment_design)
-        final_html = final_html.replace("{{comment_list_html}}", comment_list_html)
+        final_html = final_html.replace("{comment_list_html}", comment_list_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
