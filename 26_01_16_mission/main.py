@@ -6,6 +6,7 @@ from data import maslow_data
 import urllib.parse
 
 comment_list = []
+trash_can = []
 # 2. 요청을 처리할 점원(Handler) 클래스 만들기
 #    (힌트: BaseHTTPRequestHandler를 상속받아야 해요)
 class MyHandler(BaseHTTPRequestHandler):
@@ -23,20 +24,6 @@ class MyHandler(BaseHTTPRequestHandler):
         with open("comment_form.html", "r", encoding="utf-8") as f:
             comment_design = f.read()
 
-        # 1. [Delete] 삭제 요청 처리
-        if "/delete" in self.path:
-            try:
-                target_id = int(self.path.split("id=")[1])
-                maslow_data = [item for item in maslow_data if item['id'] != target_id]
-            except:
-                pass
-            
-            # 삭제 후 새로고침 효과 (Location 헤더로 재접속 유도)
-            self.send_response(303)
-            self.send_header('Location', '/')
-            self.end_headers()
-            return # 삭제 처리가 끝났으면 여기서 함수 종료!
-        
         # [Comment Delete] 댓글 삭제 요청 처리
         if "/delete_comment" in self.path:
             try:
@@ -56,6 +43,29 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Location', '/')
             self.end_headers()
             return
+        # 1. [Delete] 삭제 요청 처리
+        if "/delete" in self.path:
+            try:
+                # 주소창에서 id 뽑아오기
+                target_id = int(self.path.split("id=")[1])
+                
+                # 바로 지우지 말고, maslow_data를 돌면서 id가 일치하는 항목을 찾기
+                for item in maslow_data:
+                    if item['id'] == target_id:
+                        # 찾은 항목을 휴지통 리스트에 추가!
+                        trash_can.append(item)
+                
+                # 원래 하던 대로 maslow_data에서 해당 id 항목 제외하고 다시 저장
+                maslow_data = [item for item in maslow_data if item['id'] != target_id]
+
+            except:
+                pass
+            
+            # 삭제 후 새로고침 효과 (Location 헤더로 재접속 유도)
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers()
+            return # 삭제 처리가 끝났으면 여기서 함수 종료!
         
         # [Create] 새로운 단계 추가 로직
         if "/create" in self.path:
