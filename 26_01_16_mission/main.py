@@ -162,6 +162,8 @@ class MyHandler(BaseHTTPRequestHandler):
                         # 휴지통에서는 이제 빼주기
                         trash_can.remove(t_item)
                         break
+                # 데이터 정렬하기
+                maslow_data.sort(key=lambda x: x['id'])
             except:
                 pass
 
