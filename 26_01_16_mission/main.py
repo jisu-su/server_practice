@@ -149,6 +149,27 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
         
+        # [restore] 휴지통에서 복구 요청 처리
+        if "/restore" in self.path:
+            try:
+                # 주소창에서 복구할 target_id 뽑아오기
+                target_id = int(self.path.split("id=")[1])
+                # trash_can 리스트를 돌면서 id가 일치하는 항목 찾기
+                for t_item in trash_can:
+                    if t_item['id'] == target_id:
+                        # 찾은 항목을 다시 maslow_data에 추가
+                        maslow_data.append(t_item)
+                        # 휴지통에서는 이제 빼주기
+                        trash_can.remove(t_item)
+                        break
+            except:
+                pass
+
+            self.send_response(303)
+            self.send_header('Location', '/')
+            self.end_headers()
+            return
+        
         # stages_html 불러오기
         with open("stages.html", "r", encoding="utf-8") as f:
             stages_design = f.read()
