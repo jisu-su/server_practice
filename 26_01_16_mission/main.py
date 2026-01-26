@@ -14,6 +14,7 @@ class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         global maslow_data
         global comment_list
+        global trash_can
         # html 파일 불러오기
         with open("index.html", "r", encoding="utf-8") as f:
             index_design = f.read()
@@ -54,6 +55,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     if item['id'] == target_id:
                         # 찾은 항목을 휴지통 리스트에 추가!
                         trash_can.append(item)
+                        break
                 
                 # 원래 하던 대로 maslow_data에서 해당 id 항목 제외하고 다시 저장
                 maslow_data = [item for item in maslow_data if item['id'] != target_id]
@@ -186,12 +188,19 @@ class MyHandler(BaseHTTPRequestHandler):
             # f-string을 사용해 실제 댓글 내용인 msg와 삭제 버튼을 <p> 태그 사이에 넣는다.
             comment_list_html += f"<p style='border-bottom: 1px solid #eee; padding: 5px;'>{msg}{delete_comment_button}</p>"
 
+        # 휴지통에 있는 내용물들 보여줄 HTML 변수 만들기
+        trash_list_html = ""
+        # 반복문을 돌며 삭제된 데이터 조립
+        for t_item in trash_can:
+            trash_list_html += f"<li>{t_item['name']} 삭제됨</li>"
+
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
         final_html = final_html.replace("{create_form_html}", form_design)
         final_html = final_html.replace("{stages_html}", stages_html)
         final_html = final_html.replace("{comment_form_html}", comment_design)
         final_html = final_html.replace("{comment_list_html}", comment_list_html)
+        final_html = final_html.replace("{trash_list_html}", trash_list_html)
 
         # 2. 응답 상태 코드 보내기 (성공!)
         self.send_response(200)
