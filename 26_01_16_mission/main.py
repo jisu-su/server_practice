@@ -192,7 +192,10 @@ class MyHandler(BaseHTTPRequestHandler):
         trash_list_html = ""
         # 반복문을 돌며 삭제된 데이터 조립
         for t_item in trash_can:
-            trash_list_html += f"<li>{t_item['name']} 삭제됨</li>"
+            # 휴지통 목록에 [복구하기] 버튼 만들기
+            restore_button = f'<a href="/restore?id={t_item["id"]}">[복구하기]</a>'
+            trash_list_html += f"<li>{t_item['name']} {restore_button}</li>"
+
 
         # 구멍 뚫어놓은 곳에 데이터 채우기
         final_html = index_design.replace("{header_html}", header_design)
